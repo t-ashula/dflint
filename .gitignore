@@ -17,3 +17,4 @@ _testmain.go
 *.prof
 *.out
 vendor/
+dflint
