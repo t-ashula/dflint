@@ -11,6 +11,15 @@ func init() {
 	dl3000.Validate = func(root *parser.Node) bool {
 		for _, child := range root.Children {
 			if child.Value == "workdir" {
+				arg := child.Next
+				if arg == nil || arg.Value == "" {
+					AppendResult(dl3000, child)
+					return false
+				}
+				if arg.Value[0] != '/' && arg.Value[0] != '$' {
+					AppendResult(dl3000, child)
+					return false
+				}
 			}
 		}
 		return true
@@ -24,7 +33,7 @@ func init() {
 	}
 	dl4000.Validate = func(root *parser.Node) bool {
 		for _, child := range root.Children {
-			if child.Value == "maintainer" {
+			if child.Value == "maintainer" && child.Next != nil && child.Next.Value != "" {
 				return true
 			}
 		}
