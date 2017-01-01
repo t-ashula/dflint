@@ -9,9 +9,14 @@ func init() {
 		Description: "Use absolute WORKDIR",
 	}
 	dl3000.Validate = func(root *parser.Node) bool {
+		for _, child := range root.Children {
+			if child.Value == "workdir" {
+			}
+		}
 		return true
 	}
 	RegisterRule(dl3000)
+
 	dl4000 := &Rule{
 		Name:        "DL4000",
 		Severity:    SeverityInfo,

@@ -18,6 +18,8 @@ type Rule struct {
 	Validate    Validator
 }
 
+type Rules []*Rule
+
 var (
 	SeverityError   = Severity{Name: "ErrorC"}
 	SeverityWarning = Severity{Name: "WarningC"}
@@ -25,12 +27,12 @@ var (
 	SeverityStyle   = Severity{Name: "StyleC"}
 )
 
-var rules []*Rule
+var rules Rules
 
 func RegisterRule(rule *Rule) {
 	rules = append(rules, rule)
 }
 
-func GetRules() []*Rule {
+func GetRules() Rules {
 	return rules
 }
