@@ -9,25 +9,38 @@ import (
 	"github.com/docker/docker/builder/dockerfile/parser"
 )
 
+func TestRuleFind(t *testing.T) {
+	rules := Rules{
+		&Rule{
+			Name: "R1",
+		},
+		&Rule{
+			Name: "R2",
+		},
+	}
+
+	r0 := rules.Find(func(r *Rule) bool { return r.Name == "R0" })
+	if r0 != nil {
+		t.Errorf("r0 should not found")
+	}
+
+	r1 := rules.Find(func(r *Rule) bool { return r.Name == "R1" })
+	if r1 == nil {
+		t.Errorf("r1 should found")
+	}
+
+	r2 := rules.Find(IsNameMatch("R2"))
+	if r2 == nil {
+		t.Errorf("r2 +isNameMatch should found")
+	}
+
+	r0 = rules.Find(IsNameMatch("R0"))
+	if r0 != nil {
+		t.Errorf("r0 +isNameMatch should not found")
+	}
+}
+
 // utilties for test
-type findPred func(*Rule) bool
-
-func (rs Rules) find(pred findPred) *Rule {
-	for _, rule := range rules {
-		if pred(rule) {
-			return rule
-		}
-	}
-	return nil
-}
-
-func isNameMatch(name string) findPred {
-	fn := func(r *Rule) bool {
-		return r.Name == name
-	}
-	return fn
-}
-
 func buildAST(fp io.Reader) (*parser.Node, error) {
 	d := parser.Directive{
 		EscapeSeen:           false,
@@ -68,7 +81,7 @@ func dumpAST(node *parser.Node) string {
 
 func shold(name string, t *testing.T, fn func(rule *Rule, t *testing.T)) {
 	rules := GetRules()
-	rule := rules.find(isNameMatch(name))
+	rule := rules.Find(IsNameMatch(name))
 	fn(rule, t)
 }
 

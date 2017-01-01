@@ -36,3 +36,21 @@ func RegisterRule(rule *Rule) {
 func GetRules() Rules {
 	return rules
 }
+
+type FindPred func(*Rule) bool
+
+func (self Rules) Find(pred FindPred) *Rule {
+	for _, r := range self {
+		if pred(r) {
+			return r
+		}
+	}
+	return nil
+}
+
+func IsNameMatch(name string) FindPred {
+	fn := func(r *Rule) bool {
+		return r.Name == name
+	}
+	return fn
+}

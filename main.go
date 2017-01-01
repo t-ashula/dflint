@@ -12,7 +12,7 @@ import (
 )
 
 type lintOption struct {
-	IgnoreRules []*rule.Rule
+	IgnoreRules rule.Rules
 }
 
 func main() {
@@ -40,7 +40,10 @@ func realMain(c *cli.Context) error {
 	if c.NArg() < 1 {
 		return errors.New("at least one Dockerfile required")
 	}
-	ignoreRules, errorIds := checkIgnoreRule(c.StringSlice("ignore"))
+
+	knownRules := rule.GetRules()
+	ignoreNames := c.StringSlice("ignore")
+	ignoreRules, errorIds := checkIgnoreRule(knownRules, ignoreNames)
 	if errorIds != nil {
 		for _, id := range errorIds {
 			fmt.Fprintf(os.Stderr, "Ignored Unknown Rule ID: %s\n", id)
@@ -64,12 +67,26 @@ func realMain(c *cli.Context) error {
 	return nil
 }
 
-func checkIgnoreRule(names []string) ([]*rule.Rule, []string) {
-	var rules []*rule.Rule
-	return rules, nil
+func checkIgnoreRule(rules rule.Rules, names []string) (rule.Rules, []string) {
+	uniqNames := map[string]bool{}
+	for _, s := range names {
+		uniqNames[s] = true
+	}
+	var ignores rule.Rules
+	var unknowns []string
+	for s := range uniqNames {
+		r := rules.Find(rule.IsNameMatch(s))
+		if r != nil {
+			ignores = append(ignores, r)
+		} else {
+			unknowns = append(unknowns, s)
+		}
+	}
+
+	return ignores, unknowns
 }
 
-func lint(path string, opts *lintOption) (results []*rule.Result, err error) {
+func lint(path string, opts *lintOption) (results rule.Results, err error) {
 	_, err = os.Stat(path)
 	if err != nil {
 		return nil, err
@@ -93,7 +110,7 @@ func lint(path string, opts *lintOption) (results []*rule.Result, err error) {
 		return nil, err
 	}
 
-	err = filter(&results, opts.IgnoreRules)
+	results, err = filterResults(results, opts.IgnoreRules)
 	if err != nil {
 		return nil, err
 	}
@@ -110,18 +127,25 @@ func buildAST(fp io.Reader) (*parser.Node, error) {
 	return parser.Parse(fp, &d)
 }
 
-func check(ast *parser.Node, rules []*rule.Rule) ([]*rule.Result, error) {
+func check(ast *parser.Node, rules rule.Rules) (rule.Results, error) {
 	for _, r := range rules {
 		r.Validate(ast)
 	}
 	return rule.GetResults(), nil
 }
 
-func filter(results *[]*rule.Result, ignores []*rule.Rule) error {
-	return nil
+func filterResults(results rule.Results, ignores rule.Rules) (rule.Results, error) {
+	var tmp rule.Results
+	for _, result := range results {
+		r := ignores.Find(rule.IsNameMatch(result.Rule.Name))
+		if r == nil {
+			tmp = append(tmp, result)
+		}
+	}
+	return tmp, nil
 }
 
-func report(results []*rule.Result) {
+func report(results rule.Results) {
 	for i, res := range results {
 		fmt.Printf("%d: %d,%d,%d,%d: %s: %s\n", i, res.StartLine, res.StartColumn, res.EndLine, res.EndColumn, res.Rule.Name, res.Rule.Description)
 	}

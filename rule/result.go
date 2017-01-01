@@ -10,9 +10,11 @@ type Result struct {
 	EndColumn   int
 }
 
-var results []*Result
+type Results []*Result
 
-func GetResults() []*Result {
+var results Results
+
+func GetResults() Results {
 	return results
 }
 
