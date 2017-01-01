@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/docker/docker/builder/dockerfile/parser"
@@ -80,13 +81,7 @@ func lint(path string, opts *lintOption) (results []*rule.Result, err error) {
 	}
 
 	defer fp.Close()
-
-	d := parser.Directive{
-		EscapeSeen:           false,
-		LookingForDirectives: true,
-	}
-	parser.SetEscapeToken(parser.DefaultEscapeToken, &d)
-	ast, err := parser.Parse(fp, &d)
+	ast, err := buildAST(fp)
 	if err != nil {
 		fmt.Printf("%#v\n", err)
 		return nil, err
@@ -104,6 +99,15 @@ func lint(path string, opts *lintOption) (results []*rule.Result, err error) {
 	}
 
 	return results, nil
+}
+
+func buildAST(fp io.Reader) (*parser.Node, error) {
+	d := parser.Directive{
+		EscapeSeen:           false,
+		LookingForDirectives: true,
+	}
+	parser.SetEscapeToken(parser.DefaultEscapeToken, &d)
+	return parser.Parse(fp, &d)
 }
 
 func check(ast *parser.Node, rules []*rule.Rule) ([]*rule.Result, error) {
