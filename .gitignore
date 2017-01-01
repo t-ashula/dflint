@@ -18,3 +18,4 @@ _testmain.go
 *.out
 vendor/
 dflint
+tmp/
