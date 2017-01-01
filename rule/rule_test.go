@@ -56,8 +56,8 @@ func dumpAST(node *parser.Node) string {
 	}
 	dump := "Node"
 	dump += "{"
-	dump += fmt.Sprintf("Value:%s, ", node.Value)
-	dump += fmt.Sprintf("Original:%s, ", node.Original)
+	dump += fmt.Sprintf("Value:\"%s\", ", node.Value)
+	dump += fmt.Sprintf("Original:\"%s\", ", node.Original)
 	dump += fmt.Sprintf("StartLine:%d, ", node.StartLine)
 	dump += fmt.Sprintf("EndLine:%d, ", node.EndLine)
 	dump += fmt.Sprintf("Attributes:%#v, ", node.Attributes) // TODO: more detail?
@@ -71,11 +71,12 @@ func dumpAST(node *parser.Node) string {
 	if node.Children != nil {
 		for _, child := range node.Children {
 			dump += dumpAST(child)
+			dump += ", "
 		}
 	}
 	dump += "], "
 
-	dump += "}, "
+	dump += "} "
 	return dump
 }
 
