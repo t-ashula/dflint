@@ -5,15 +5,15 @@ DEBUG_FLAG = $(if $(DEBUG),-debug)
 
 updatedeps: devdeps
 	@echo "====> Install & Update depedencies..."
-	glide --verbose up
+	glide up
 
 devdeps:
 	@echo "====> Install depedencies for development..."
-	go get -v github.com/Masterminds/glide
+	go get github.com/Masterminds/glide
 
 deps: devdeps
 	@echo "====> Install depedencies..."
-	glide install
+	glide -q install
 
 build: deps
 	@echo "====> Build dflint in . "
@@ -28,7 +28,7 @@ all: build
 
 test: build devdeps
 	@echo "====> Run test"
-	go test -v $$(glide novendor)
+	go test $$(glide novendor)
 
 test-cover: build devdeps
-	go test -v -cover $$(glide novendor)
+	go test -cover $$(glide novendor)
