@@ -3,7 +3,7 @@ package rule
 import "testing"
 
 func TestDL3009(t *testing.T) {
-	name := "DL300"
+	name := "DL3009"
 
 	shouldExists(name, t)
 	t.Skip("not supported. yet")
