@@ -1,5 +1,7 @@
 # dflint
 
+[![CircleCI](https://circleci.com/gh/t-ashula/dflint.svg?style=svg)](https://circleci.com/gh/t-ashula/dflint)
+
 Dockerfile linter
 
 inspired by [hadolint](https://github.com/lukasmartinelli/hadolint/)
