@@ -26,3 +26,4 @@ You should have received a copy of the GNU General Public License along with thi
 
 - [urfave/cli](https://github.com/urfave/cli)
 - [docker/docker](https://github.com/docker/docker)
+- [mvdan/sh](https://github.com/mvdan/sh)
