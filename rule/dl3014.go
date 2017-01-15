@@ -2,8 +2,10 @@ package rule
 
 import (
 	"regexp"
+	"strings"
 
 	"github.com/docker/docker/builder/dockerfile/parser"
+	"github.com/mvdan/sh/syntax"
 )
 
 func init() {
@@ -15,8 +17,6 @@ func init() {
 	rule.Validate = func(root *parser.Node) bool {
 		valid := true
 
-		// TODO: parse shell one liner
-		yesPattern := regexp.MustCompile(`\s*apt-get\s+-y\s+.+\s*`)
 		for _, child := range root.Children {
 			if child.Value != "run" {
 				continue
@@ -27,7 +27,7 @@ func init() {
 			}
 
 			cmd := child.Next.Value
-			if !yesPattern.MatchString(cmd) {
+			if !hasYesOption(cmd) {
 				valid = false
 				AppendResult(rule, child)
 			}
@@ -36,4 +36,48 @@ func init() {
 		return valid
 	}
 	RegisterRule(rule)
+}
+
+func hasYesOption(script string) bool {
+	ast, err := syntax.Parse(strings.NewReader(script), "", 0)
+	if err != nil {
+		return false
+	}
+	has := false
+	yesPattern := regexp.MustCompile(`^-[^-]*y.*$`)
+	syntax.Walk(ast, func(node syntax.Node) bool {
+		expr, isCall := node.(*syntax.CallExpr)
+		if !isCall {
+			return true
+		}
+
+		fname, err := funcName(expr)
+
+		if err != nil || fname != "apt-get" {
+			return false
+		}
+
+		args, err := funcArgs(expr)
+		if err != nil {
+			return false
+		}
+
+		ins, yes := false, false
+		for _, arg := range args {
+			if arg == "install" {
+				ins = true
+			}
+			if arg == "-y" || arg == "--yes" || arg == "--assume-yes" ||
+				yesPattern.MatchString(arg) {
+				yes = true
+			}
+			if ins && yes {
+				has = true
+				break
+			}
+		}
+		// no need to digging
+		return false
+	})
+	return has
 }
