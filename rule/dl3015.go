@@ -1,9 +1,10 @@
 package rule
 
 import (
-	"regexp"
+	"strings"
 
 	"github.com/docker/docker/builder/dockerfile/parser"
+	"github.com/mvdan/sh/syntax"
 )
 
 func init() {
@@ -15,8 +16,6 @@ func init() {
 	rule.Validate = func(root *parser.Node) bool {
 		valid := true
 
-		// TODO: parse shell one liner
-		pattern := regexp.MustCompile(`\s*apt-get.+--no-install-recommends\s+.+\s*`)
 		for _, child := range root.Children {
 			if child.Value != "run" {
 				continue
@@ -27,7 +26,7 @@ func init() {
 			}
 
 			cmd := child.Next.Value
-			if !pattern.MatchString(cmd) {
+			if !hasNoIstallRecommends(cmd) {
 				valid = false
 				AppendResult(rule, child)
 			}
@@ -35,5 +34,48 @@ func init() {
 
 		return valid
 	}
+
 	RegisterRule(rule)
+}
+
+func hasNoIstallRecommends(script string) bool {
+	ast, err := syntax.Parse(strings.NewReader(script), "", 0)
+	if err != nil {
+		return false
+	}
+	has := false
+	syntax.Walk(ast, func(node syntax.Node) bool {
+		expr, isCall := node.(*syntax.CallExpr)
+		if !isCall {
+			return true
+		}
+
+		fname, err := funcName(expr)
+
+		if err != nil || fname != "apt-get" {
+			return false
+		}
+
+		args, err := funcArgs(expr)
+		if err != nil {
+			return false
+		}
+
+		ins, rec := false, false
+		for _, arg := range args {
+			if arg == "install" {
+				ins = true
+			}
+			if arg == "--no-install-recommends" {
+				rec = true
+			}
+			if ins && rec {
+				has = true
+				break
+			}
+		}
+		// no need to digging
+		return false
+	})
+	return has
 }
