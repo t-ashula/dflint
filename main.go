@@ -23,7 +23,7 @@ func main() {
 func setupApp() *cli.App {
 	app := cli.NewApp()
 	app.Name = "dflint"
-	app.Version = "0.0.1"
+	app.Version = "0.0.2"
 	app.Flags = []cli.Flag{
 		cli.StringSliceFlag{
 			Name:  "ignore, i",
