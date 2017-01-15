@@ -1,9 +1,10 @@
 package rule
 
 import (
-	"regexp"
+	"strings"
 
 	"github.com/docker/docker/builder/dockerfile/parser"
+	"github.com/mvdan/sh/syntax"
 )
 
 func init() {
@@ -15,21 +16,57 @@ func init() {
 	rule.Validate = func(root *parser.Node) bool {
 		valid := true
 		for _, child := range root.Children {
-			if child.Value == "run" {
-				arg := child.Next
-				if arg == nil || arg.Value == "" {
-					continue
-				}
+			if child.Value != "run" {
+				continue
+			}
 
-				// TODO: parse shell one liner
-				cmd := regexp.MustCompile(`[\s;(|&]*apt-get([^;&|]*)?(\s+dist-)?upgrade[\s)|&]*`)
-				if cmd.MatchString(arg.Value) {
-					AppendResult(rule, child)
-					valid = false
-				}
+			arg := child.Next
+			if arg == nil || arg.Value == "" {
+				continue
+			}
+
+			if aptUpgrade(arg.Value) {
+				AppendResult(rule, child)
+				valid = false
 			}
 		}
+
 		return valid
 	}
 	RegisterRule(rule)
+}
+
+func aptUpgrade(script string) bool {
+	ast, err := syntax.Parse(strings.NewReader(script), "", 0)
+	if err != nil {
+		return false
+	}
+	has := false
+	syntax.Walk(ast, func(node syntax.Node) bool {
+		expr, isCall := node.(*syntax.CallExpr)
+		if !isCall {
+			return true
+		}
+
+		fname, err := funcName(expr)
+
+		if err != nil || fname != "apt-get" {
+			return false
+		}
+
+		args, err := funcArgs(expr)
+		if err != nil {
+			return false
+		}
+
+		for _, arg := range args {
+			if arg == "upgrade" || arg == "dist-upgrade" {
+				has = true
+				break
+			}
+		}
+		// no need to digging
+		return false
+	})
+	return has
 }
