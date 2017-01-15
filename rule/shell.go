@@ -46,6 +46,7 @@ func funcArgs(expr *syntax.CallExpr) ([]string, error) {
 	for i, arg := range expr.Args {
 		args[i] = wordAsString(arg)
 	}
+	args = args[1:]
 	return args, nil
 }
 
