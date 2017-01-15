@@ -28,7 +28,7 @@ func init() {
 
 			cmd := child.Next.Value
 
-			if notPinned(cmd) {
+			if notPipPinned(cmd) {
 				valid = false
 				AppendResult(rule, child)
 			}
@@ -39,7 +39,7 @@ func init() {
 	RegisterRule(rule)
 }
 
-func notPinned(script string) bool {
+func notPipPinned(script string) bool {
 	ast, err := syntax.Parse(strings.NewReader(script), "", 0)
 	if err != nil {
 		return false

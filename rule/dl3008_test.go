@@ -13,4 +13,7 @@ func TestDL3008(t *testing.T) {
 
 	invalidSource := "RUN apt-get install python emacs"
 	shouldInvalid(name, invalidSource, t)
+
+	invalidSource = "RUN apt-get install python emacs=24"
+	shouldInvalid(name, invalidSource, t)
 }
