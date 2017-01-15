@@ -41,7 +41,7 @@ func init() {
 }
 
 func hasSymbolicLinkCommand(script string) bool {
-	shortArg := regexp.MustCompile(`^-.*s.*$`)
+	shortArg := regexp.MustCompile(`^-[bdFfiLnPrStTv]*s[bdFfiLnPrStTv]*$`)
 	ast, err := syntax.Parse(strings.NewReader(script), "", 0)
 	if err != nil {
 		return false
