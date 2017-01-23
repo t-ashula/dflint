@@ -12,7 +12,8 @@ import (
 )
 
 type lintOption struct {
-	IgnoreRules rule.Rules
+	IgnoreRules    rule.Rules
+	ShellCheckPath string
 }
 
 func main() {
@@ -28,6 +29,10 @@ func setupApp() *cli.App {
 		cli.StringSliceFlag{
 			Name:  "ignore, i",
 			Usage: "ignore rules",
+		},
+		cli.StringFlag{
+			Name:  "shellcheck",
+			Usage: "set ShellCheck Path",
 		},
 	}
 	app.Usage = "lint Dockerfile"
@@ -50,8 +55,17 @@ func realMain(c *cli.Context) error {
 		}
 	}
 
+	scpath := c.String("shellcheck")
+	if scpath == "" {
+		autopath, err := shellCheckPath()
+		if err == nil {
+			scpath = autopath
+		}
+	}
+
 	opts := &lintOption{
-		IgnoreRules: ignoreRules,
+		IgnoreRules:    ignoreRules,
+		ShellCheckPath: scpath,
 	}
 
 	files := c.Args()
@@ -105,6 +119,9 @@ func lint(path string, opts *lintOption) (results rule.Results, err error) {
 	}
 
 	rules := rule.GetRules()
+	if opts.ShellCheckPath != "" {
+		rule.RegisterRule(shellCheckRule(opts.ShellCheckPath))
+	}
 	results, err = check(ast, rules)
 	if err != nil {
 		return nil, err

@@ -25,6 +25,7 @@ var (
 	SeverityWarning = Severity{Name: "WarningC"}
 	SeverityInfo    = Severity{Name: "InfoC"}
 	SeverityStyle   = Severity{Name: "StyleC"}
+	SeverityUnknown = Severity{Name: "UnknownC"}
 )
 
 var rules Rules
