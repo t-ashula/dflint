@@ -1,4 +1,4 @@
-# dflint [![CircleCI](https://circleci.com/gh/t-ashula/dflint.svg?style=svg)](https://circleci.com/gh/t-ashula/dflint)
+# dflint [![CircleCI](https://circleci.com/gh/t-ashula/dflint.svg?style=shield)](https://circleci.com/gh/t-ashula/dflint)
 
 Dockerfile linter by go.
 
