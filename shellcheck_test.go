@@ -8,7 +8,12 @@ import (
 )
 
 func TestRunShellCheck(t *testing.T) {
-	res, err := runShellCheck("/usr/bin/shellcheck", "$foo is $BAR")
+	path, err := shellCheckPath()
+	if err != nil || path == "" {
+		t.Skip("no shellcheck found")
+	}
+
+	res, err := runShellCheck(path, "$foo is $BAR")
 	if err != nil {
 		t.Fatalf("err:%v\n", err)
 	}
