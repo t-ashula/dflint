@@ -53,11 +53,13 @@ func hasNoIstallRecommends(script string) bool {
 		fname, err := funcName(expr)
 
 		if err != nil || fname != "apt-get" {
+			has = true
 			return false
 		}
 
 		args, err := funcArgs(expr)
 		if err != nil {
+			has = true
 			return false
 		}
 
