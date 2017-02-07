@@ -94,6 +94,14 @@ func shouldExists(name string, t *testing.T) {
 	})
 }
 
+func shouldNotExists(name string, t *testing.T) {
+	shold(name, t, func(rule *Rule, t *testing.T) {
+		if rule != nil {
+			t.Errorf("rule %s should not found.\n", name)
+		}
+	})
+}
+
 // TODO: refactor valid/invalid
 func shouldValid(name string, source string, t *testing.T) {
 	shold(name, t, func(rule *Rule, t *testing.T) {

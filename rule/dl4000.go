@@ -18,5 +18,6 @@ func init() {
 		AppendResult(dl4000, nil) // XXX:
 		return false
 	}
-	RegisterRule(dl4000)
+	// DL4000 is deprecated
+	// RegisterRule(dl4000)
 }
