@@ -1,10 +1,6 @@
 package rule
 
-import (
-	"regexp"
-
-	"github.com/docker/docker/builder/dockerfile/parser"
-)
+import "github.com/docker/docker/builder/dockerfile/parser"
 
 func init() {
 	rule := &Rule{
@@ -14,29 +10,8 @@ func init() {
 	}
 	rule.Validate = func(root *parser.Node) bool {
 		valid := true
-
-		mailPattern := regexp.MustCompile(`.+@.+`)
-		urlPattern := regexp.MustCompile(`https?://.+`)
-		for _, child := range root.Children {
-			if child.Value != "maintainer" {
-				continue
-			}
-
-			if child.Next == nil {
-				valid = false
-				AppendResult(rule, child)
-				continue
-			}
-
-			name := child.Next.Value
-			if !mailPattern.MatchString(name) && !urlPattern.MatchString(name) {
-				valid = false
-				AppendResult(rule, child)
-				continue
-			}
-		}
-
 		return valid
 	}
-	RegisterRule(rule)
+	// DL3012 is deprecated
+	// RegisterRule(dl4000)
 }
