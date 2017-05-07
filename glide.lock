@@ -1,5 +1,5 @@
 hash: 8b408af91b4b365d099582c87eff2a28ed5326809fbc29eef6f32377d8dcfdd4
-updated: 2017-01-13T19:33:53.287642178+09:00
+updated: 2017-04-19T19:20:46.901010352+09:00
 imports:
 - name: github.com/docker/docker
   version: 5374d53322abd6a5b2ebb34b7422abc26d1b5eb3
@@ -7,7 +7,9 @@ imports:
   - builder/dockerfile/command
   - builder/dockerfile/parser
 - name: github.com/mvdan/sh
-  version: 30547cffe230935bf87e19a03dfb8972e4b717df
+  version: 2f47121e00825e5758d8ab7af19405b0e74402e5
+  subpackages:
+  - syntax
 - name: github.com/urfave/cli
   version: 0bdeddeeb0f650497d603c4ad7b20cfe685682f6
 testImports: []
