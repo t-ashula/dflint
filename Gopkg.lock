@@ -4,19 +4,20 @@
 [[projects]]
   name = "github.com/docker/docker"
   packages = ["builder/dockerfile/command","builder/dockerfile/parser"]
-  revision = "5374d53322abd6a5b2ebb34b7422abc26d1b5eb3"
+  revision = "092cba3727bb9b4a2f0e922cd6c0f93ea270e363"
+  version = "v1.13.1"
 
 [[projects]]
   name = "github.com/mvdan/sh"
   packages = ["syntax"]
-  revision = "8fad302d59abc4e7ba5a4728f9e276cc50ccd083"
-  version = "v1.3.0"
+  revision = "0f4c621ee3b193113a7ad33c5a9aecb6eaa8e250"
+  version = "v1.3.1"
 
 [[projects]]
   name = "github.com/urfave/cli"
   packages = ["."]
-  revision = "0bdeddeeb0f650497d603c4ad7b20cfe685682f6"
-  version = "v1.19.1"
+  revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
+  version = "v1.20.0"
 
 [solve-meta]
   analyzer-name = "dep"
