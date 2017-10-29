@@ -1,34 +1,41 @@
+NAME   := dflint
+VERSION  := v0.0.4
+REVISION := $(shell git rev-parse --short HEAD)
 
+SRCS     := *.go rule/*.go
+PKGS     := $(shell go list ./...)
+LDFLAGS  := "-X main.Version=$(VERSION)"
 
-COMMIT = $$(git describe --always)
-DEBUG_FLAG = $(if $(DEBUG),-debug)
+all: $(NAME)
 
-updatedeps: devdeps
-	@echo "====> Install & Update depedencies..."
-	glide up
+$(NAME): $(SRCS)
+	go build -ldflags $(LDFLAGS) -o $(NAME)
 
-devdeps:
-	@echo "====> Install depedencies for development..."
-	go get github.com/Masterminds/glide
+dep:
+ifeq ($(shell command -v dep 2> /dev/null),)
+	go get github.com/golang/dep/cmd/dep
+endif
 
-deps: devdeps
-	@echo "====> Install depedencies..."
-	glide -q install
+deps: dep
+	dep ensure
 
-build: deps
-	@echo "====> Build dflint in . "
-	go build
+test:
+	go test -cover $(PKGS)
 
-install: build
-	@echo "====> Install dflint in $(GOPATH)/bin ..."
-	@go install
+test-cover:
+	echo 'mode: atomic' > cover-all.out
+	$(foreach pkg, $(PKGS), \
+		go test -coverprofile=cover.out -covermode=atomic -v $(pkg); \
+		tail -n +2 cover.out >> cover-all.out; \
+	)
+	go tool cover -func=cover-all.out
 
-all: build
-	@echo "====> All "
+clean:
+	rm -rf $(NAME) cover-all.out cover.out bin vendor
 
-test: build devdeps
-	@echo "====> Run test"
-	go test $$(glide novendor)
+force: clean all
 
-test-cover: build devdeps
-	go test -cover $$(glide novendor)
+install:
+	go install
+
+.PHONY: force clean test-cover test all deps dep

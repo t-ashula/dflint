@@ -11,6 +11,8 @@ import (
 	"github.com/urfave/cli"
 )
 
+var Version string
+
 type lintOption struct {
 	IgnoreRules    rule.Rules
 	ShellCheckPath string
@@ -24,7 +26,7 @@ func main() {
 func setupApp() *cli.App {
 	app := cli.NewApp()
 	app.Name = "dflint"
-	app.Version = "0.0.3"
+	app.Version = Version
 	app.Flags = []cli.Flag{
 		cli.StringSliceFlag{
 			Name:  "ignore, i",
